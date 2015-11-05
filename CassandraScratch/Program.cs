@@ -37,10 +37,9 @@ namespace CassandraScratch
 
         private static ISession Connect()
         {
-            var builder = Cluster.Builder().AddContactPoints(new List<string> {"127.0.0.1"}).WithDefaultKeyspace("test");
+            var builder = Cluster.Builder().AddContactPoints(new List<string> {"127.0.0.1"});
             var cluster = builder.Build();
-            var connectAndCreateDefaultKeyspaceIfNotExists = cluster.ConnectAndCreateDefaultKeyspaceIfNotExists();
-            return connectAndCreateDefaultKeyspaceIfNotExists;
+            return cluster.Connect("test");
         }
     }
 }
