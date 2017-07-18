@@ -11,35 +11,47 @@ namespace CassandraScratch
         public static void Main(string[] args)
         {
             TryConnect();
-            AsyncContext.Run(() => TryConnectAsync());
+            AsyncContext.Run(TryConnectAsync);
         }
 
-        private static Task TryConnectAsync()
+        private static async Task TryConnectAsync()
         {
-            TryConnect();
-            return Task.FromResult(1);
+            try
+            {
+                var cluster = BuildCluster();
+                using (var session = await cluster.ConnectAsync())
+                {
+                    Console.WriteLine("Async Connected");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Async Failed");
+            }
         }
 
         private static void TryConnect()
         {
             try
             {
-                using (var session = Connect())
+                var cluster = BuildCluster();
+                using (var session = cluster.Connect())
                 {
-                    Console.WriteLine("Connected");
+                    Console.WriteLine("Sync Connected");
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Failed");
+                Console.WriteLine("Sync Failed");
             }
         }
 
-        private static ISession Connect()
+        private static Cluster BuildCluster()
         {
             var builder = Cluster.Builder().AddContactPoints(new List<string> {"127.0.0.1"});
             var cluster = builder.Build();
-            return cluster.Connect("test");
+            return cluster;
         }
+
     }
 }
